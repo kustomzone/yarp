@@ -14,6 +14,7 @@
 #include <yarp/os/Property.h>
 #include <yarp/os/NameStore.h>
 #include <yarp/os/QosStyle.h>
+#include <yarp/os/Time.h>
 
 //protects against some dangerous ACE macros
 #ifdef main
@@ -615,6 +616,8 @@ public:
      */
     virtual ~Network();
 
+    static void forceSystemClock();
+
     /**
      * Initialization.  On some operating systems, there are certain
      * start-up tasks that need to be performed, and this method does
@@ -631,6 +634,9 @@ public:
      * your program, and to call this method towards the end.
      */
     static void fini();
+    
+    static void yarpClockInit();
+private:
 
 };
 

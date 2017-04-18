@@ -31,6 +31,7 @@ public:
      */
     explicit Stamp();
 
+// private:
     /**
      * Constuct a Stamp with a given sequence number and time.
      *
@@ -38,8 +39,9 @@ public:
      * @param time the time stamp (in seconds, relative to an arbitrary.
      * zero time)
      */
-    Stamp(int count, double time);
+     Stamp(int count, double time);
 
+public:
     /**
      * Get the sequence number.
      *
@@ -75,12 +77,13 @@ public:
      */
     void update();
 
+// private:
     /**
      * Set the timestamp to a given time, and increments the sequence number
      * (wrapping to 0 if the sequence exceeds Stamp::getMaxCount())
      */
     void update(double time);
-
+public:
     // Documented in Portable
     virtual bool read(ConnectionReader& connection) YARP_OVERRIDE;
 

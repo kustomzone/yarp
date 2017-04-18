@@ -6,7 +6,7 @@
 get_property(YARP_TREE_INCLUDE_DIRS TARGET YARP_dev PROPERTY INCLUDE_DIRS)
 include_directories(${YARP_TREE_INCLUDE_DIRS})
 add_executable(yarpdev yarpdev.cpp)
-target_link_libraries(yarpdev YARP_init YARP_dev)
+target_link_libraries(yarpdev YARP_init YARP_dev YARP_OS)
 
 install(TARGETS yarpdev
         COMPONENT utilities

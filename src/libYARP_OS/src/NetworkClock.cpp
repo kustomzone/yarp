@@ -57,7 +57,7 @@ NetworkClock::~NetworkClock()
 }
 
 
-bool NetworkClock::open(const ConstString &clockSource_portName)
+bool NetworkClock::open(const ConstString &clockSource_portName, const ConstString &localPortName)
 {
     port.setReadOnly();
     port.setReader(*this);
@@ -69,7 +69,7 @@ bool NetworkClock::open(const ConstString &clockSource_portName)
 
 
     // this should be an anonymous port to not pollute the yarp name list  ( or use the $PID/clock:in ?)
-    ConstString myName = "...";
+    ConstString myName = localPortName;
 
     //    #include <yarp/conf/system.h>
     //    pid = ACE_OS::getpid();
@@ -146,7 +146,13 @@ bool NetworkClock::read(ConnectionReader &reader)
     bool ok = bot.read(reader);
 
     yInfo("read %s\n", bot.toString().c_str());
-    if (!ok)
+    if(closing)
+    {
+        t = -1;
+        return false;
+    }
+
+    if (!ok && !closing)
     {
         yError() << "Error reading clock port";
         return false;

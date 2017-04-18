@@ -14,7 +14,9 @@
 #include <yarp/dev/Drivers.h>
 
 int main(int argc, char *argv[]) {
-    yarp::os::Network yarp;
+//     yarp::os::Network::forceSystemClock();
+    yarp::os::Network::initMinimum(); // yarp;
     int ret=yarp::dev::Drivers::yarpdev(argc,argv);
+    yarp::os::Network::finiMinimum(); //
     return (ret!=0?1:0);
 }

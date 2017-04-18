@@ -463,6 +463,15 @@ int Drivers::yarpdev(int argc, char *argv[]) {
         return -1;
     }
 
+    //
+    // For yarpdev initializa the clock only before starting to do real thing.
+    // This way yarpdev --lish/help will not be affected by network clock.
+    //
+    // Shall other devices be affected by network clock ??
+    // Hereafter we may be required to instantiate both real HW devices and `fake` simulated ones.
+    //
+    yarp::os::Network::yarpClockInit();
+
     PolyDriver dd(options);
     if (verbose) {
         toDox(dd,stdout);

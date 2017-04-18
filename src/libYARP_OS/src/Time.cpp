@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2006, 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia, Anne van Rossum
- * Authors: Paul Fitzpatrick, Anne van Rossum
+ * Authors: Paul Fitzpatrick, Anne van Rossum, Alberto Cardellino
  * CopyPolicy: Released under the terms of the LGPLv2.1 or later, see LGPL.TXT
  */
 
@@ -64,7 +64,7 @@ static Clock *createsystemClock()
  * 
  * When getClock() is called, and no clock has been set, the systemClock will be created and used.
  */
-static Clock *createNetworkClock()
+static Clock *createNetworkClock(const ConstString localName = "...")
 {   
     // this is a private function, no need for lock(), mutex shall be used by caller
 
@@ -81,7 +81,7 @@ static Clock *createNetworkClock()
 
     if (_networkClock)
     {
-        if (_networkClock->open(name))
+        if (_networkClock->open(name, localName))
         {
             network_clock_ok      = true;    // see if it is really needed
             // updating clock pointer with the new one already initialized.
@@ -222,7 +222,7 @@ void Time::useSystemClock()
     }
 }
 
-void Time::useNetworkClock(const ConstString &clock)
+void Time::useNetworkClock(const ConstString &clock, const ConstString &localPortName)
 {
     // re-create the clock also in case we already use a network clock, because
     // the input clock port may be different or the clock producer may be changed
@@ -230,7 +230,7 @@ void Time::useNetworkClock(const ConstString &clock)
     network_clock_name = new ConstString(clock);
     removeClock();
     lock();
-    pclock = createNetworkClock();
+    pclock = createNetworkClock(localPortName);
     unlock();
     isValid();
 }

@@ -26,7 +26,7 @@ public:
     NetworkClock();
     virtual ~NetworkClock();
 
-    bool open(const ConstString& name);
+    bool open(const ConstString& clockSourcePortName, const ConstString &localPortName="...");  // default shall be anonimous
 
     virtual double now() YARP_OVERRIDE;
     virtual void delay(double seconds) YARP_OVERRIDE;

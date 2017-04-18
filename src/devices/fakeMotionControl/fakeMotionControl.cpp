@@ -430,6 +430,8 @@ bool FakeMotionControl::open(yarp::os::Searchable &config)
 {
     std::string str;
 
+//     yarp::os::Time::useNetworkClock("/clock");
+    
 //     if (!config.findGroup("GENERAL").find("MotioncontrolVersion").isInt())
 //     {
 //         yError() << "Missing MotioncontrolVersion parameter. yarprobotinterface cannot start. Please contact icub-support@iit.it";

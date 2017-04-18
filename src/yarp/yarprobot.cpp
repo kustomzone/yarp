@@ -11,7 +11,8 @@
 #include <yarp/os/ResourceFinderOptions.h>
 #include <yarp/os/Bottle.h>
 #include <yarp/os/Os.h>
-#include <cstdio>
+#include <yarp/os/Network.h>
+#include <stdio.h>
 
 #include "yarpcontextutils.h"
 #include "yarprobot.h"
@@ -35,7 +36,10 @@ void yarp_robot_help() {
 
 }
 
-int yarp_robot_main(int argc, char *argv[]) {
+int yarp_robot_main(int argc, char *argv[]) 
+{
+    yarp::os::Network::forceSystemClock();       // Yarp server must always run using system clock
+
     yarp::os::Property options;
     options.fromCommand(argc,argv);
     if (options.check("help")) {

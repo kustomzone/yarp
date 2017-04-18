@@ -11,6 +11,7 @@
 #include <iostream>
 #include <yarp/os/Log.h>
 #include <yarp/os/LogStream.h>
+#include <yarp/os/NetworkClock.h>
 
 #include <cstring>         // for memset function
 

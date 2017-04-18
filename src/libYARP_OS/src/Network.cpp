@@ -47,7 +47,8 @@ using namespace yarp::os::impl;
 using namespace yarp::os;
 
 static int __yarp_is_initialized = 0;
-static bool __yarp_auto_init_active = false; // was yarp auto-initialized?
+static bool __yarp_auto_init_active = false;            // was yarp auto-initialized?
+static bool __yarp_init_force_system_clock = false;     // force system clock during yarp initialization (ignore environment variables)
 
 static MultiNameSpace *__multi_name_space = YARP_NULLPTR;
 
@@ -673,6 +674,26 @@ void NetworkBase::finiMinimum() {
 #endif
     }
     if (__yarp_is_initialized>0) __yarp_is_initialized--;
+}
+
+void yarp::os::Network::forceSystemClock()
+{
+    __yarp_init_force_system_clock = true;
+}
+ 
+void yarp::os::Network::yarpClockInit()
+{
+    yarp::os::ConstString clock = yarp::os::Network::getEnvironment("YARP_CLOCK");
+    if( (__yarp_init_force_system_clock== true) || (clock=="") )
+    {
+        std::cout << "\n >>>> Cool with SYSTEM clock\n";
+        yarp::os::Time::useSystemClock();
+    }
+    else
+    {
+        std::cout << "\n >>>> Setting NETWORK clock\n";
+        yarp::os::Time::useNetworkClock(clock);
+    }
 }
 
 Contact NetworkBase::queryName(const ConstString& name) {

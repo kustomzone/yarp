@@ -103,7 +103,7 @@ private:
 
 private:
     // This Network yarp must be placed before any other stuff
-    yarp::os::Network yarp;
+//     yarp::os::Network yarp;
     SignalHandler sigHandler;
     VideoProducer videoProducer;
 #ifdef YARP_LITTLE_ENDIAN

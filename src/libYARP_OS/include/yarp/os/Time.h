@@ -79,7 +79,7 @@ public:
      * \see yarp::os::NetworkClock
      *
      */
-    static void useNetworkClock(const ConstString& clock);
+    static void useNetworkClock(const ConstString& clock, const ConstString &localPortName="...");
 
     /**
      *

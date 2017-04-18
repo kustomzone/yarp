@@ -15,6 +15,8 @@ using namespace yarp::os;
 QtYARPView::QtYARPView(QQuickItem *parent):
     QQuickItem(parent),sigHandler(this)
 {
+    yarp::os::Network::forceSystemClock();
+    yarp::os::Network::init();
     ptr_portCallback = NULL;
     setOptionsToDefault();
     _pOutPort = NULL;
@@ -39,6 +41,7 @@ QtYARPView::~QtYARPView()
     if (_options.m_saveOnExit != 0){
         saveOptFile(_options.m_fileName);
     }
+    yarp::os::Network::fini();
 }
 
 /*! \brief Freeze the video stream.

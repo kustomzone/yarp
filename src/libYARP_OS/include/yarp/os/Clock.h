@@ -47,6 +47,19 @@ public:
      *
      */
     virtual bool isValid() const = 0;
+
+    /*
+     * Wake up waiting threads
+     *
+     */
+    virtual bool interruptDelay() { return false;}
+
+
+    /*
+     * Use another clock as a source for this clock instance????
+     *
+     */
+    virtual bool synchWithOtherClock() { return false;}
 };
 
 #endif // YARP_OS_CLOCK_H
