@@ -29,11 +29,17 @@ private:
     double adaptedPeriod;
     RateThread& owner;
     Semaphore mutex;
+
+#ifdef USE_TIME_VAL
     YARP_timeval now;
     YARP_timeval currentRunTV;
     YARP_timeval previousRunTV;
     YARP_timeval sleep;
     YARP_timeval sleepPeriodTV;
+#else
+    double  sleepPeriodTV;
+#endif
+
     //ACE_High_Res_Timer thread_timer; // timer to estimate thread time
 
     bool suspended;
@@ -133,9 +139,12 @@ public:
 
     void singleStep() {
         lock();
+#ifdef USE_TIME_VAL
         getTime(currentRunTV);
         currentRun=toDouble(currentRunTV);
-
+#else
+        currentRun = Time::now();
+#endif
         if (scheduleReset)
             _resetStat();
 
@@ -163,21 +172,30 @@ public:
         count++;
         lock();
 
+#ifdef USE_TIME_VAL
         YARP_timeval elapsedTV;
         getTime(elapsedTV);
         double elapsed=toDouble(elapsedTV)-currentRun;
-
+#else
+        double elapsed = yarp::os::Time::now() - currentRun;
+#endif
         //save last
         totalUsed+=elapsed*1000;
         sumUsedSq+=elapsed*1000*elapsed*1000;
         unlock();
 
+#ifdef USE_TIME_VAL
         //compute sleep time
         fromDouble(sleepPeriodTV, adaptedPeriod, 1000);
         addTime(sleepPeriodTV, currentRunTV);
         subtractTime(sleepPeriodTV, elapsedTV);
         // Time::delay(sleep_period/1000.0);
         sleepThread(sleepPeriodTV);
+#else
+        sleepPeriodTV= adaptedPeriod/1000.0 - elapsed;  //  *1000 because period here is in [ms]
+        // Check if sleepPeriod is negative here or inside the delay (or both?)
+        yarp::os::Time::delay(sleepPeriodTV);
+#endif
     }
 
     void run() override {
