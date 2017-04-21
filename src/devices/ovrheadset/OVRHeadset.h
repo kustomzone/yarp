@@ -37,7 +37,7 @@ namespace dev {
 
 
 class OVRHeadset : public yarp::dev::DeviceDriver,
-                   public yarp::os::RateThread,
+                   public yarp::os::SystemRateThread,
                    public yarp::dev::IService,
                    public yarp::dev::IJoypadController
 {

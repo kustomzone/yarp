@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     qputenv("QT_DEVICE_PIXEL_RATIO", QByteArray("auto"));
 #endif
 
-
+    Network::forceSystemClock();
     Network yarp;
     if (!yarp.checkNetwork())
     {

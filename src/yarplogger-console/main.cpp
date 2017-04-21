@@ -172,6 +172,7 @@ class logger_module : public yarp::os::RFModule
 
 int main(int argc, char *argv[])
 {
+    Network::forceSystemClock();
     yarp::os::Network yarp;
     if (!yarp.checkNetwork())
     {

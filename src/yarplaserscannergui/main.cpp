@@ -282,6 +282,7 @@ void display_help()
 
 int main(int argc, char *argv[])
 {
+    Network::forceSystemClock();
     Network yarp;
 
     ResourceFinder rf;

@@ -30,8 +30,7 @@ static void sighandler (int signal)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-
+    yarp::os::Network::forceSystemClock();
     yarp::os::Network yarp;
     if (!yarp.checkNetwork())
     {
@@ -39,6 +38,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    QApplication a(argc, argv);
     yarp::os::ResourceFinder rf;
     rf.setVerbose(true);
     rf.setDefaultConfigFile("yarprunLogger.ini");           //overridden by --from parameter

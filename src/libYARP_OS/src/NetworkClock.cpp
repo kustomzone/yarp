@@ -18,7 +18,7 @@ using namespace yarp::os;
 typedef std::list<std::pair<double, Semaphore *> > Waiters;
 
 NetworkClock::NetworkClock()
-    : pwaiters(YARP_NULLPTR), sec(0), nsec(0), t(0), closing(false), clockName(""), initted(false)
+    : clockName(""), pwaiters(YARP_NULLPTR), sec(0), nsec(0), t(0), closing(false), initted(false)
 {
     pwaiters = new Waiters();
     yAssert(pwaiters!=YARP_NULLPTR);

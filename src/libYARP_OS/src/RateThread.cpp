@@ -12,6 +12,7 @@
 #include <yarp/os/Semaphore.h>
 
 #include <yarp/os/Time.h>
+#include <yarp/os/SystemClock.h>
 
 #include <cmath> //sqrt
 
@@ -25,20 +26,16 @@ using namespace yarp::os;
 class RateThreadCallbackAdapter: public ThreadImpl
 {
 private:
-    unsigned int period;
+    unsigned int period_ms;
     double adaptedPeriod;
     RateThread& owner;
     Semaphore mutex;
+    
+    bool useSystemClock;   // force to use the system clock. Used by SystemRateThread only
 
-#ifdef USE_TIME_VAL
-    YARP_timeval now;
-    YARP_timeval currentRunTV;
-    YARP_timeval previousRunTV;
-    YARP_timeval sleep;
-    YARP_timeval sleepPeriodTV;
-#else
-    double  sleepPeriodTV;
-#endif
+    double  elapsed;
+    double  sleepPeriod;
+
 
     //ACE_High_Res_Timer thread_timer; // timer to estimate thread time
 
@@ -60,17 +57,24 @@ private:
         totalT=0;
         sumUsedSq=0;
         sumTSq=0;
+        elapsed=0;
         scheduleReset=false;
     }
 
 public:
 
     RateThreadCallbackAdapter(RateThread& owner, int p) : owner(owner) {
-        period=p;
+        period_ms=p;
+        elapsed=0;
         suspended = false;
         _resetStat();
     }
 
+    void forceSystemClock()
+    {
+        useSystemClock = true;
+    }
+    
     void resetStat() {
         scheduleReset=true;
     }
@@ -81,7 +85,7 @@ public:
         if (estPIt==0)
             ret=0;
         else
-            ret=totalT/estPIt;
+            ret=(totalT/estPIt) *1000;
         unlock();
         return ret;
     }
@@ -94,10 +98,11 @@ public:
         } else {
             av=totalT/estPIt;
             if (estPIt>1) {
-                std=sqrt(((1.0/(estPIt-1))*(sumTSq-estPIt*av*av)));
+                std=sqrt(((1.0/(estPIt-1))*(sumTSq-estPIt*av*av))) *1000;  // av is computed in [secs], while user expects data in [ms]
             } else {
                 std=0;
             }
+            av*=1000;    // av is computed in [secs], while user expects data in [ms]
         }
         unlock();
     }
@@ -115,7 +120,7 @@ public:
         if (count<1)
             ret=0.0;
         else
-            ret=totalUsed/count;
+            ret=totalUsed/count*1000;
         unlock();
         return ret;
     }
@@ -128,10 +133,11 @@ public:
         } else {
             av=totalUsed/count;
             if (count>1) {
-                std=sqrt((1.0/(count-1))*(sumUsedSq-count*av*av));
+                std=sqrt((1.0/(count-1))*(sumUsedSq-count*av*av)) *1000;
             } else {
                 std=0;
             }
+            av*=1000;
         }
         unlock();
     }
@@ -139,22 +145,15 @@ public:
 
     void singleStep() {
         lock();
-#ifdef USE_TIME_VAL
-        getTime(currentRunTV);
-        currentRun=toDouble(currentRunTV);
-#else
         currentRun = Time::now();
-#endif
+
         if (scheduleReset)
             _resetStat();
 
         if (count>0) {
-            //double saved=adaptedPeriod;
-            double dT=(currentRun-previousRun)*1000;
+            double dT=(currentRun-previousRun);
             sumTSq+=dT*dT;
             totalT+=dT;
-            //double error=(static_cast<double>(period)-dT);
-            //adaptedPeriod+=0.0*error; //not available
             if (adaptedPeriod<0)
                 adaptedPeriod=0;
 
@@ -172,36 +171,78 @@ public:
         count++;
         lock();
 
-#ifdef USE_TIME_VAL
-        YARP_timeval elapsedTV;
-        getTime(elapsedTV);
-        double elapsed=toDouble(elapsedTV)-currentRun;
-#else
         double elapsed = yarp::os::Time::now() - currentRun;
-#endif
+
         //save last
-        totalUsed+=elapsed*1000;
-        sumUsedSq+=elapsed*1000*elapsed*1000;
+        totalUsed+=elapsed;
+        sumUsedSq+=elapsed*elapsed;
         unlock();
 
-#ifdef USE_TIME_VAL
-        //compute sleep time
-        fromDouble(sleepPeriodTV, adaptedPeriod, 1000);
-        addTime(sleepPeriodTV, currentRunTV);
-        subtractTime(sleepPeriodTV, elapsedTV);
-        // Time::delay(sleep_period/1000.0);
-        sleepThread(sleepPeriodTV);
-#else
-        sleepPeriodTV= adaptedPeriod/1000.0 - elapsed;  //  *1000 because period here is in [ms]
+        sleepPeriod= adaptedPeriod - elapsed; // everything is in [seconds] except period, for it is used in the interface as [ms]
         // Check if sleepPeriod is negative here or inside the delay (or both?)
-        yarp::os::Time::delay(sleepPeriodTV);
-#endif
+        yarp::os::Time::delay(sleepPeriod);
     }
 
-    void run() override {
-        adaptedPeriod=period;
-        while(!isClosing()) {
-            singleStep();
+    void singleStepSystem() 
+    {
+        lock();
+        currentRun = SystemClock::nowSystem();
+
+        if (scheduleReset)
+            _resetStat();
+
+        if (count>0) 
+        {
+            double dT=(currentRun-previousRun); // *1000;
+
+            sumTSq+=dT*dT;
+            totalT+=dT;
+
+            if (adaptedPeriod<0)
+                adaptedPeriod=0;
+
+            estPIt++;
+        }
+
+        previousRun=currentRun;
+        unlock();
+
+        if (!suspended) 
+        {
+            owner.run();
+        }
+
+        count++;
+        lock();
+
+        double elapsed = SystemClock::nowSystem() - currentRun;
+
+        //save last
+        totalUsed+=elapsed;
+        sumUsedSq+=elapsed*elapsed;
+        unlock();
+
+        sleepPeriod= adaptedPeriod - elapsed;  //  all time computatio are done in [sec]
+        // Check if sleepPeriod is negative here or inside the delay (or both?)
+        SystemClock::delaySystem(sleepPeriod);
+    }
+
+    void run() override
+    {
+        adaptedPeriod = period_ms/1000;   //  /1000 because user's period is [ms] while all the rest is [secs]
+        if(useSystemClock)
+        {
+            while(!isClosing()) 
+            {
+                singleStepSystem();
+            }            
+        }
+        else
+        {
+            while(!isClosing()) 
+            {
+                singleStep();
+            }
         }
     }
 
@@ -214,13 +255,13 @@ public:
     }
 
     bool setRate(int p) {
-        period=p;
-        adaptedPeriod=period;
+        period_ms=p;
+        adaptedPeriod=period_ms/1000;
         return true;
     }
 
     double getRate() {
-        return period;
+        return period_ms;
     }
 
     bool isSuspended() {
@@ -267,6 +308,11 @@ RateThread::~RateThread()
         delete ((RateThreadCallbackAdapter*)implementation);
         implementation = YARP_NULLPTR;
     }
+}
+
+void RateThread::forceSystemClock()
+{
+    ((RateThreadCallbackAdapter*)implementation)->forceSystemClock();
 }
 
 bool RateThread::setRate(int period)
@@ -382,6 +428,24 @@ int RateThread::getPriority()
 int RateThread::getPolicy()
 {
     return ((ThreadImpl*)implementation)->getPolicy();
+}
+
+//
+//  System Rate Thread
+//
+
+SystemRateThread::SystemRateThread(int period) : RateThread(period)
+{
+    RateThread::forceSystemClock();
+}
+
+SystemRateThread::~SystemRateThread()
+{ }
+
+bool SystemRateThread::stepSystem()
+{
+    ((RateThreadCallbackAdapter*)implementation)->singleStepSystem();
+    return true;
 }
 
 

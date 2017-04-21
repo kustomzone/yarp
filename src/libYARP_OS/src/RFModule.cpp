@@ -287,22 +287,34 @@ double RFModule::getPeriod() {
 }
 
 
-int RFModule::runModule() {
+int RFModule::runModule() 
+{
     if (HELPER(implementation).getSingletonRunModule()) return 1;
     HELPER(implementation).setSingletonRunModule();
 
     // Setting up main loop
 
+// Use yarp::os::Time... why not?
+#ifdef USE_TIME_VAL
     YARP_timeval currentRunTV;
     YARP_timeval elapsedTV;
     YARP_timeval sleepPeriodTV;
     YARP_timeval oneSecTV;
 
     fromDouble(oneSecTV, 1.0);
-
-    while (!isStopping()) {
+#else
+    double currentRun;
+    double elapsed;
+    double sleepPeriod;
+#endif
+    
+    while (!isStopping()) 
+    {
+#ifdef USE_TIME_VAL
         getTime(currentRunTV);
-
+#else
+        currentRun = yarp::os::Time::now();
+#endif
         // If updateModule() returns false we exit the main loop.
         if (!updateModule()) {
             break;
@@ -311,18 +323,40 @@ int RFModule::runModule() {
         // The module is stopped for getPeriod() seconds.
         // If getPeriod() returns a time > 1 second, we check every second if
         // the module stopping, and eventually we exit the main loop.
-        do {
+#ifdef USE_TIME_VAL
+        do 
+        {
             getTime(elapsedTV);
             fromDouble(sleepPeriodTV, getPeriod());
             addTime(sleepPeriodTV, currentRunTV);
             subtractTime(sleepPeriodTV, elapsedTV);
-            if (toDouble(sleepPeriodTV) > 1) {
+            if (toDouble(sleepPeriodTV) > 1) 
+            {
                 sleepThread(oneSecTV);
-            } else {
+            } 
+            else 
+            {
                 sleepThread(sleepPeriodTV);
                 break;
             }
         } while (!isStopping());
+
+#else
+        do
+        {
+            elapsed = yarp::os::Time::now() - currentRun;
+            sleepPeriod = getPeriod() - elapsed;
+            if(sleepPeriod > 1)
+            {
+                Time::delay(1.0);
+            } 
+            else 
+            {
+                Time::delay(sleepPeriod);
+                break;
+            }
+        } while (!isStopping());
+#endif
     }
 
     yInfo("RFModule closing.");

@@ -22,6 +22,7 @@
 #include <yarp/sig/Image.h>
 #include <yarp/os/LockGuard.h>
 #include <yarp/os/Property.h>
+#include <yarp/os/SystemClock.h>
 #include <yarp/math/FrameTransform.h>
 
 #include <cmath>
@@ -132,7 +133,7 @@ static ovrGraphicsLuid GetDefaultAdapterLuid()
 
 yarp::dev::OVRHeadset::OVRHeadset() :
         yarp::dev::DeviceDriver(),
-        yarp::os::RateThread(11), // ~90 fps
+        yarp::os::SystemRateThread(11), // ~90 fps
         orientationPort(nullptr),
         positionPort(nullptr),
         angularVelocityPort(nullptr),
@@ -805,7 +806,7 @@ bool yarp::dev::OVRHeadset::updateService()
 
     resetStat();
 
-    yarp::os::Time::delay(delay);
+    yarp::os::SystemClock::delaySystem(delay);
     return !closed;
 }
 
@@ -968,7 +969,7 @@ void yarp::dev::OVRHeadset::run()
     } else {
         // Do not warn more than once every 5 seconds
         static double lastOrientWarnTime = 0;
-        double now = yarp::os::Time::now();
+        double now = yarp::os::SystemClock::nowSystem();
         if(now >= lastOrientWarnTime + 5) {
             yDebug() << "Orientation not tracked";
             lastOrientWarnTime = now;
@@ -1010,7 +1011,7 @@ void yarp::dev::OVRHeadset::run()
     } else {
         // Do not warn more than once every 5 seconds
         static double lastPosWarnTime = 0;
-        double now = yarp::os::Time::now();
+        double now = yarp::os::SystemClock::nowSystem();
         if(now >= lastPosWarnTime + 5) {
             yDebug() << "Position not tracked";
             lastPosWarnTime = now;
@@ -1054,7 +1055,7 @@ void yarp::dev::OVRHeadset::run()
     } else {
         // Do not warn more than once every 5 seconds
         static double lastPredOrientWarnTime = 0;
-        double now = yarp::os::Time::now();
+        double now = yarp::os::SystemClock::nowSystem();
         if(now >= lastPredOrientWarnTime + 5) {
             yDebug() << "Predicted orientation not tracked";
             lastPredOrientWarnTime = now;
@@ -1096,7 +1097,7 @@ void yarp::dev::OVRHeadset::run()
     } else {
         // Do not warn more than once every 5 seconds
         static double lastPredPosWarnTime = 0;
-        double now = yarp::os::Time::now();
+        double now = yarp::os::SystemClock::nowSystem();
         if(now >= lastPredPosWarnTime + 5) {
             yDebug() << "Position not tracked";
             lastPredPosWarnTime = now;
@@ -1107,9 +1108,9 @@ void yarp::dev::OVRHeadset::run()
     if(displayPorts[0]->eyeRenderTexture && displayPorts[1]->eyeRenderTexture) {
         // Do distortion rendering, Present and flush/sync
 
-        //static double ttt =yarp::os::Time::now();
-        //yDebug () << yarp::os::Time::now() - ttt;
-        //ttt = yarp::os::Time::now();
+        //static double ttt = yarp::os::SystemClock::nowSystem();
+        //yDebug () << yarp::os::SystemClock::nowSystem() - ttt;
+        //ttt = yarp::os::SystemClock::nowSystem();
         // Update the textures
         for (int eye = 0; eye < ovrEye_Count; ++eye) {
             displayPorts[eye]->eyeRenderTexture->update();
@@ -1264,7 +1265,7 @@ void yarp::dev::OVRHeadset::run()
     } else {
         // Do not warn more than once every 5 seconds
         static double lastImgWarnTime = 0;
-        double now = yarp::os::Time::now();
+        double now = yarp::os::SystemClock::nowSystem();
         if(now >= lastImgWarnTime + 5) {
             yDebug() << "No image received";
             lastImgWarnTime = now;
