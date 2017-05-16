@@ -363,7 +363,7 @@ yarp::os::ConstString RGBDSensorClient::getLastErrorMsg(yarp::os::Stamp *timeSta
 bool RGBDSensorClient::getRgbImage(yarp::sig::FlexImage &rgbImage, yarp::os::Stamp *timeStamp)
 {
     if(timeStamp)
-        timeStamp->update(yarp::os::Time::now());
+        colorFrame_StreamingPort.getEnvelope(*timeStamp);
     return streamingReader->readRgb(rgbImage);
 }
 

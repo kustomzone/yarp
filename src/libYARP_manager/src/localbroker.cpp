@@ -278,7 +278,7 @@ bool LocalBroker::stop()
     stopCmd(ID);
 #endif
 
-    double base = Time::now();
+    double base = SystemClock::nowSystem();
     while(!timeout(base, STOP_TIMEOUT))
     {
         if(!running())
@@ -307,7 +307,7 @@ bool LocalBroker::kill()
     stopCmd(ID);
 #endif
 
-    double base = Time::now();
+    double base = SystemClock::nowSystem();
     while(!timeout(base, KILL_TIMEOUT))
     {
         if(!running())
@@ -444,7 +444,7 @@ const char* LocalBroker::requestRpc(const char* szport, const char* request, dou
     for(int i=0; i<10; i++) {
         ret = NetworkBase::connect(port.getName().c_str(), szport, style);
         if(ret) break;
-        Time::delay(1.0);
+        SystemClock::delaySystem(1.0);
     }
 
     if(!ret) {
@@ -498,8 +498,8 @@ void LocalBroker::detachStdout(void)
 
 bool LocalBroker::timeout(double base, double timeout)
 {
-    Time::delay(1.0);
-    if((Time::now()-base) > timeout)
+    SystemClock::delaySystem(1.0);
+    if((SystemClock::nowSystem()-base) > timeout)
         return true;
     return false;
 }
@@ -526,7 +526,7 @@ void LocalBroker::run()
         buff[dwRead] = (CHAR)0;
         if(eventSink && strlen(buff))
             eventSink->onBrokerStdout(buff);
-        yarp::os::Time::delay(0.5); // this prevents event flooding
+        yarp::os::SystemClock::delaySystem(0.5); // this prevents event flooding
     }
 #else
     while(!Thread::isStopping())
@@ -541,7 +541,7 @@ void LocalBroker::run()
                     strmsg += string(buff);
                 if(eventSink && strmsg.size())
                     eventSink->onBrokerStdout(strmsg.c_str());
-                yarp::os::Time::delay(0.5); // this prevents event flooding
+                yarp::os::SystemClock::delaySystem(0.5); // this prevents event flooding
            }
         }
     }

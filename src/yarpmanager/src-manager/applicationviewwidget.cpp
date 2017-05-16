@@ -869,7 +869,7 @@ void ApplicationViewWidget::onAssignHost()
 
         }
         safeManager.safeLoadBalance();
-        yarp::os::Time::delay(0.1);
+        yarp::os::SystemClock::delaySystem(0.1);
 
 
     } else {
@@ -1004,7 +1004,7 @@ bool ApplicationViewWidget::onRun()
     }
 
     safeManager.safeRun(MIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllModule(false);
     return true;
 }
@@ -1072,7 +1072,7 @@ bool ApplicationViewWidget::onStop()
 
 
     safeManager.safeStop(MIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllModule(false);
     return true;
 }
@@ -1142,7 +1142,7 @@ bool ApplicationViewWidget::onKill()
 
 
     safeManager.safeKill(MIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllModule(false);
     return true;
 }
@@ -1200,7 +1200,7 @@ bool ApplicationViewWidget::onConnect()
 
 
     safeManager.safeConnect(MIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllConnections(false);
     return true;
 }
@@ -1232,7 +1232,7 @@ bool ApplicationViewWidget::onDisconnect()
 
 
     safeManager.safeDisconnect(MIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllConnections(false);
     return true;
 }
@@ -1293,7 +1293,7 @@ bool ApplicationViewWidget::onRefresh()
     safeManager.safeRefresh(modulesIDs,
                         connectionsIDs,
                         resourcesIDs);
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
     selectAllConnections(false);
     selectAllModule(false);
     selectAllResources(false);
@@ -1602,7 +1602,7 @@ void ApplicationViewWidget::onYARPView()
                 else
                 {
                     // waiting for the port to get open
-                    double base = yarp::os::Time::now();
+                    double base = yarp::os::SystemClock::nowSystem();
                     while(!timeout(base, 3.0)) {
                         if (launcher.exists(to.toLatin1().data())) {
                             break;
@@ -1621,7 +1621,7 @@ void ApplicationViewWidget::onYARPView()
     }
 
 
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
 }
 
 /*! \brief Launch YARPHear Inspection modality*/
@@ -1663,7 +1663,7 @@ void ApplicationViewWidget::onYARPHear()
                 else
                 {
                     // waiting for the port to get open
-                    double base = yarp::os::Time::now();
+                    double base = yarp::os::SystemClock::nowSystem();
                     while(!timeout(base, 3.0)) {
                         if (launcher.exists(to.toLatin1().data())) {
                             break;
@@ -1687,7 +1687,7 @@ void ApplicationViewWidget::onYARPHear()
 
         }
     }
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
 
 
 
@@ -1732,7 +1732,7 @@ void ApplicationViewWidget::onYARPRead()
                 else
                 {
                     // waiting for the port to get open
-                    double base = yarp::os::Time::now();
+                    double base = yarp::os::SystemClock::nowSystem();
                     while(!timeout(base, 3.0)) {
                         if (launcher.exists(to.toLatin1().data())) {
                             break;
@@ -1751,7 +1751,7 @@ void ApplicationViewWidget::onYARPRead()
     }
 
 
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
 
 }
 
@@ -1795,7 +1795,7 @@ void ApplicationViewWidget::onYARPScope()
                 }
                 else{
                     // waiting for the port to get open
-                    double base = yarp::os::Time::now();
+                    double base = yarp::os::SystemClock::nowSystem();
                     while(!timeout(base, 3.0))
                         if (launcher.exists(to.toLatin1().data())) break;
                     if (!launcher.connect(from.toLatin1().data(), to.toLatin1().data(), "udp")) {
@@ -1810,15 +1810,15 @@ void ApplicationViewWidget::onYARPScope()
 
         }
     }
-    yarp::os::Time::delay(0.1);
+    yarp::os::SystemClock::delaySystem(0.1);
 }
 
 
 
 bool ApplicationViewWidget::timeout(double base, double timeout)
 {
-    yarp::os::Time::delay(1.0);
-    if ((yarp::os::Time::now()-base) > timeout)
+    yarp::os::SystemClock::delaySystem(1.0);
+    if ((yarp::os::SystemClock::nowSystem()-base) > timeout)
         return true;
     return false;
 }

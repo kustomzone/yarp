@@ -489,7 +489,7 @@ int Companion::cmdPing(int argc, char *argv[]) {
             for (int i=0; i<10; i++) {
                 ping.connect();
                 ping.report();
-                Time::delay(0.25);
+                SystemClock::delaySystem(0.25);
             }
             return 0;
         }
@@ -648,7 +648,7 @@ int Companion::wait(const char *target, bool silent, const char *target2) {
             result = exists(target, true);
         }
         if (result!=0) {
-            Time::delay(0.1);
+            SystemClock::delaySystem(0.1);
         } else {
             done = true;
         }
@@ -1324,14 +1324,14 @@ int Companion::cmdCheck(int argc, char *argv[]) {
     Port out;
     out.open("...");
 
-    Time::delay(1);
+    SystemClock::delaySystem(1);
 
     YARP_INFO(log, "==================================================================");
     YARP_INFO(log, "=== Trying to connect some ports");
 
     connect(out.getName().c_str(), in.getName().c_str());
 
-    Time::delay(1);
+    SystemClock::delaySystem(1);
 
     YARP_INFO(log, "==================================================================");
     YARP_INFO(log, "=== Trying to write some data");
@@ -1340,13 +1340,13 @@ int Companion::cmdCheck(int argc, char *argv[]) {
     bot.addInt(42);
     out.write(bot);
 
-    Time::delay(1);
+    SystemClock::delaySystem(1);
 
     YARP_INFO(log, "==================================================================");
     bool ok = false;
     for (int i=0; i<3; i++) {
         YARP_INFO(log, "=== Trying to read some data");
-        Time::delay(1);
+        SystemClock::delaySystem(1);
         if (check.get() != YARP_NULLPTR) {
             int x = check.get()->getInt(0);
             char buf[256];
@@ -1362,7 +1362,7 @@ int Companion::cmdCheck(int argc, char *argv[]) {
     YARP_INFO(log, "=== Trying to close some ports");
     in.close();
     out.close();
-    Time::delay(1);
+    SystemClock::delaySystem(1);
     if (!ok) {
         YARP_INFO(log, "*** YARP seems broken.");
         //diagnose();
@@ -2120,7 +2120,7 @@ int Companion::write(const char *name, int ntargets, char *targets[]) {
             if (waitConnect) {
                 double delay = 0.1;
                 while (port.getOutputCount()<1) {
-                    Time::delay(delay);
+                    SystemClock::delaySystem(delay);
                     delay *= 2;
                     if (delay>4) delay = 4;
                 }
@@ -2136,7 +2136,7 @@ int Companion::write(const char *name, int ntargets, char *targets[]) {
     if (port.isWriting()) {
         double delay = 0.1;
         while (port.isWriting()) {
-            Time::delay(delay);
+            SystemClock::delaySystem(delay);
             delay *= 2;
             if (delay>4) delay = 4;
         }

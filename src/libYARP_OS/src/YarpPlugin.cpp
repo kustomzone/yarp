@@ -161,7 +161,7 @@ void YarpPluginSelector::scan() {
     // If it was scanned in the last 5 seconds, there is no need to scan again
     bool need_scan = true;
     if (config.check("last_update_time")) {
-        if (Time::now()-config.find("last_update_time").asDouble() < 5) {
+        if (SystemClock::nowSystem()-config.find("last_update_time").asDouble() < 5) {
             need_scan = false;
         }
     }
@@ -225,5 +225,5 @@ void YarpPluginSelector::scan() {
     }
 
     // Update last_update_time
-    config.put("last_update_time", Time::now());
+    config.put("last_update_time", SystemClock::nowSystem());
 }

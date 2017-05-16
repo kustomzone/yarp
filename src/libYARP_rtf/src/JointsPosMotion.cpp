@@ -123,7 +123,7 @@ bool yarp::rtf::jointsPosMotion::setAndCheckPosControlMode()
     for (size_t i = 0; i < mPriv->jointsList.size(); i++) {
         mPriv->icmd->setControlMode((int)mPriv->jointsList[i], VOCAB_CM_POSITION);
         mPriv->iimd->setInteractionMode((int)mPriv->jointsList[i], VOCAB_IM_STIFF);
-        yarp::os::Time::delay(0.010);
+        Time::delay(0.010);
     }
 
     int cmode;
@@ -146,7 +146,7 @@ bool yarp::rtf::jointsPosMotion::setAndCheckPosControlMode()
             RTF_ASSERT_ERROR("Unable to set control mode/interaction mode");
         }
 
-        yarp::os::Time::delay(0.2);
+        Time::delay(0.2);
 
     }
 
@@ -192,7 +192,7 @@ bool yarp::rtf::jointsPosMotion::goToSingle(int j, double pos, double *reached_p
             break;
         }
 
-        yarp::os::Time::delay(0.2);
+        Time::delay(0.2);
     }
 
     if(reached_pos != YARP_NULLPTR) {
@@ -226,7 +226,7 @@ bool yarp::rtf::jointsPosMotion::goTo(yarp::sig::Vector positions, yarp::sig::Ve
             ret = false;
             break;
         }
-        yarp::os::Time::delay(0.2);
+        Time::delay(0.2);
     }
 
     if(reached_pos != YARP_NULLPTR) {

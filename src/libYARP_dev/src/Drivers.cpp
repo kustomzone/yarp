@@ -564,7 +564,7 @@ int Drivers::yarpdev(int argc, char *argv[]) {
         } else {
             // we don't need to do anything
             yInfo("device active in background...");
-            Time::delay(dnow);
+            SystemClock::delaySystem(dnow);
         }
     }
 

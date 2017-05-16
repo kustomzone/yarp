@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         done = true;
     }
 
-    //Time::delay(1);
+    //SystemClock::delaySystem(1);
     //Network::connect("/grabber","/foo");
 
     Monitor monitor;

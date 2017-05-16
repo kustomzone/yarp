@@ -11,7 +11,7 @@
 #include "yarpimpl.h"
 
 YARP_DEFINE(void) yarpTimeDelay(double seconds) {
-    Time::delay(seconds);
+    Time::delay((seconds);
 }
 
 YARP_DEFINE(double) yarpTimeNow() {

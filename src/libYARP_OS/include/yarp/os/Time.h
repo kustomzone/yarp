@@ -7,8 +7,10 @@
 #ifndef YARP_OS_TIME_H
 #define YARP_OS_TIME_H
 
-#include <yarp/os/ConstString.h>
 #include <yarp/os/Clock.h>
+#include <yarp/os/ConstString.h>
+#include <yarp/os/SystemClock.h>
+#include <yarp/os/NetworkClock.h>
 
 namespace yarp {
     namespace os {

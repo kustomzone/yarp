@@ -229,7 +229,7 @@ public:
 
     void run() override
     {
-        adaptedPeriod = period_ms/1000;   //  /1000 because user's period is [ms] while all the rest is [secs]
+        adaptedPeriod = period_ms/1000;   //  divide by 1000 because user's period is [ms] while all the rest is [secs]
         if(useSystemClock)
         {
             while(!isClosing()) 

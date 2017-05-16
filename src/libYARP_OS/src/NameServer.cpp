@@ -953,7 +953,7 @@ int NameServer::main(int argc, char *argv[]) {
 
         while (true) {
             YARP_DEBUG(Logger::get(), "name server running happily");
-            Time::delay(60);
+            SystemClock::delaySystem(60);
         }
         server.close();
 #ifdef YARP_HAS_ACE

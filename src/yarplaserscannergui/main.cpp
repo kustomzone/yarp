@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
             cvShowImage("Laser Scanner GUI",img);
         }
 
-        Time::delay(double(period)/1000.0+0.005);
+        SystemClock::delaySystem(double(period)/1000.0+0.005);
 
         //if ESC is pressed, exit.
         int keypressed = cvWaitKey(2); //wait 2ms. Lower values do not work under Linux
