@@ -210,6 +210,8 @@ private:
 
         void run() override {
             if (done) askToStop();
+        void threadRelease() override {
+            done =false;
         }
     };
 
