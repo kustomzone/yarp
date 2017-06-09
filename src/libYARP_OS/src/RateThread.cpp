@@ -26,7 +26,7 @@ using namespace yarp::os;
 class RateThreadCallbackAdapter: public ThreadImpl
 {
 private:
-    unsigned int period_ms;
+    float period_ms;
     double adaptedPeriod;
     RateThread& owner;
     Semaphore mutex;
@@ -63,7 +63,7 @@ private:
 
 public:
 
-    RateThreadCallbackAdapter(RateThread& owner, int p) : owner(owner) {
+    RateThreadCallbackAdapter(RateThread& owner, int p) : owner(owner), useSystemClock(false) {
         period_ms=p;
         elapsed=0;
         suspended = false;
@@ -229,7 +229,7 @@ public:
 
     void run() override
     {
-        adaptedPeriod = period_ms/1000;   //  divide by 1000 because user's period is [ms] while all the rest is [secs]
+        adaptedPeriod = period_ms/1000.0;   //  divide by 1000 because user's period is [ms] while all the rest is [secs]
         if(useSystemClock)
         {
             while(!isClosing()) 
@@ -256,7 +256,7 @@ public:
 
     bool setRate(int p) {
         period_ms=p;
-        adaptedPeriod=period_ms/1000;
+        adaptedPeriod = period_ms/1000.0;   //  divide by 1000 because user's period is [ms] while all the rest is [secs]
         return true;
     }
 
