@@ -145,7 +145,6 @@ bool NetworkClock::read(ConnectionReader &reader)
     Bottle bot;
     bool ok = bot.read(reader);
 
-    yInfo("read %s\n", bot.toString().c_str());
     if(closing)
     {
         t = -1;
